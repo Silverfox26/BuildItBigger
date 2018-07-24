@@ -6,9 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.jokeandroidlibrary.TellMeASillyJoke;
-import com.example.jokelib.Jokes;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -43,13 +43,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startJokeActivity(View view) {
-        Jokes jokes = new Jokes();
 
-        Intent startTellJokeActivity = new Intent(this, TellMeASillyJoke.class);
-        startTellJokeActivity.putExtra(TellMeASillyJoke.JOKE_EXTRA_KEY, jokes.getJoke());
+        new JokeAsyncTask(new JokeAsyncTask.JokeAsyncTaskCallback() {
+            @Override
+            public void onJokeRetrieved(String result) {
+                if (result != null) {
+                    Intent startTellJokeActivity = new Intent(MainActivity.this, TellMeASillyJoke.class);
+                    startTellJokeActivity.putExtra(TellMeASillyJoke.JOKE_EXTRA_KEY, result);
 
-        startActivity(startTellJokeActivity);
+                    startActivity(startTellJokeActivity);
+                } else {
+                    Toast.makeText(MainActivity.this, "Joke could not be loaded", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).execute();
     }
-
-
 }
